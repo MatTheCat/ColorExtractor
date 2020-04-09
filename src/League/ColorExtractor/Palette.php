@@ -44,6 +44,23 @@ class Palette implements \Countable, \IteratorAggregate
     }
 
     /**
+     * @param string $url
+     * 
+     * @return string
+     */
+    private static function url_get_contents ($url) {
+        if (!function_exists('curl_init')){ 
+            return file_get_contents($url);
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        return $output;
+    }
+
+    /**
      * @param string   $filename
      * @param int|null $backgroundColor
      *
@@ -51,7 +68,7 @@ class Palette implements \Countable, \IteratorAggregate
      */
     public static function fromFilename($filename, $backgroundColor = null)
     {
-        $image = imagecreatefromstring(file_get_contents($filename));
+        $image = imagecreatefromstring(self::url_get_contents($filename));
         $palette = self::fromGD($image, $backgroundColor);
         imagedestroy($image);
 
